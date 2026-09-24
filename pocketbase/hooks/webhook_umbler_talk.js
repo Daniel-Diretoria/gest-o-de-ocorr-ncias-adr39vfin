@@ -66,7 +66,9 @@ routerAdd(
         const linha = linhas[i].toLowerCase()
         for (let j = 0; j < rotulos.length; j++) {
           if (linha.indexOf(rotulos[j]) !== -1) {
-            const valor = linhas[i].substring(linhas[i].indexOf(':') + 1).trim()
+            const idx = linha.indexOf(':')
+            if (idx === -1) continue // linha solta sem rotulo "X: valor" nao conta
+            const valor = linhas[i].substring(idx + 1).trim()
             if (valor) return valor
           }
         }

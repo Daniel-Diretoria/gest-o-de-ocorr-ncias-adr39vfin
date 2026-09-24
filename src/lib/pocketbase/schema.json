@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T21:24:36.643Z",
+  "generatedAt": "2026-09-24T21:39:43.055Z",
   "collections": [
     {
       "name": "users",
@@ -29,19 +29,614 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        },
+        {
+          "name": "role",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "admin",
+            "supervisao",
+            "promotor"
+          ]
         }
       ],
       "indexes": [
         "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
         "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
+      ]
+    },
+    {
+      "name": "industrias",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'admin' || @request.auth.role = 'supervisao')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'admin' || @request.auth.role = 'supervisao')",
+        "delete": "@request.auth.id != '' && @request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "ativa",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_industrias_nome ON industrias (nome)"
+      ]
+    },
+    {
+      "name": "lojas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'admin' || @request.auth.role = 'supervisao')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'admin' || @request.auth.role = 'supervisao')",
+        "delete": "@request.auth.id != '' && @request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "rede",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "endereco",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ativa",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_lojas_nome ON lojas (nome)"
+      ]
+    },
+    {
+      "name": "promotores",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'admin' || @request.auth.role = 'supervisao')",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'admin' || @request.auth.role = 'supervisao')",
+        "delete": "@request.auth.id != '' && @request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "telefone",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ativo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "industria_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "industrias"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_promotores_nome ON promotores (nome)"
+      ]
+    },
+    {
+      "name": "ocorrencias",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != '' && @request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "numero",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_ocorrencia",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "promotor_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "promotores"
+        },
+        {
+          "name": "repositor_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "loja_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "lojas"
+        },
+        {
+          "name": "loja_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "industria_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "industrias"
+        },
+        {
+          "name": "industria_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "produto",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "situacao",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "acao_realizada",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contato_loja",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "precisa_apoio",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "midia",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "categoria",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "estrutura",
+            "ruptura",
+            "validade",
+            "avaria",
+            "reposicao",
+            "equipamento",
+            "atendimento",
+            "outro"
+          ]
+        },
+        {
+          "name": "gravidade",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "baixa",
+            "media",
+            "alta",
+            "critica"
+          ]
+        },
+        {
+          "name": "prioridade",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "baixa",
+            "media",
+            "alta",
+            "urgente"
+          ]
+        },
+        {
+          "name": "visibilidade",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "interno",
+            "representante",
+            "industria"
+          ]
+        },
+        {
+          "name": "responsavel_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "sla_prazo",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "nova",
+            "em_analise",
+            "direcionada",
+            "em_tratativa",
+            "aguardando_loja",
+            "aguardando_industria",
+            "aguardando_representante",
+            "resolvida",
+            "cancelada",
+            "improcedente"
+          ]
+        },
+        {
+          "name": "resolvida_em",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tempo_resolucao_min",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "origem",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "whatsapp",
+            "manual"
+          ]
+        },
+        {
+          "name": "mensagem_bruta",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "criado_por",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX idx_ocorrencias_numero ON ocorrencias (numero)",
+        "CREATE INDEX idx_ocorrencias_status ON ocorrencias (status)",
+        "CREATE INDEX idx_ocorrencias_industria ON ocorrencias (industria_id)",
+        "CREATE INDEX idx_ocorrencias_loja ON ocorrencias (loja_id)"
+      ]
+    },
+    {
+      "name": "tratativas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && (autor_id = @request.auth.id || @request.auth.role = 'admin' || @request.auth.role = 'supervisao')",
+        "delete": "@request.auth.id != '' && @request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "ocorrencia_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "ocorrencias"
+        },
+        {
+          "name": "autor_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "tipo",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "contato",
+            "acao",
+            "retorno",
+            "observacao",
+            "evidencia"
+          ]
+        },
+        {
+          "name": "descricao",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "previsao",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "evidencia",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_tratativas_ocorrencia ON tratativas (ocorrencia_id)"
+      ]
+    },
+    {
+      "name": "mensagens_whatsapp",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": null,
+        "update": null,
+        "delete": "@request.auth.id != '' && @request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "origem",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "evento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "remetente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "conteudo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "payload",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "processada",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "erro",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ocorrencia_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "ocorrencias"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_mensagens_processada ON mensagens_whatsapp (processada)"
       ]
     }
   ]

@@ -14,7 +14,12 @@ routerAdd(
     const headers = info.headers || {}
     const query = info.query || {}
     const token =
-      headers['x-webhook-token'] || headers['x-webhook-token'.toUpperCase()] || query.token || ''
+      headers['x_webhook_token'] ||
+      headers['x-webhook-token'] ||
+      headers['X-Webhook-Token'] ||
+      headers['X_WEBHOOK_TOKEN'] ||
+      query.token ||
+      ''
     if (token !== SECRET) {
       return e.unauthorizedError('Token invalido')
     }
@@ -94,7 +99,7 @@ routerAdd(
       }
     }
 
-    let numero = Math.floor(Date.now() / 1000) % 1000000
+    let numero = 1
     try {
       const ultimas = $app.findRecordsByFilter('ocorrencias', '', '-numero', 1, 0)
       if (ultimas && ultimas.length > 0) {

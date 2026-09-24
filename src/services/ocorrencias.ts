@@ -39,13 +39,11 @@ export interface Ocorrencia {
 }
 
 export const getOcorrencias = (options?: any) =>
-  pb
-    .collection('ocorrencias')
-    .getFullList({
-      sort: '-numero',
-      expand: 'promotor_id,loja_id,industria_id,responsavel_id',
-      ...options,
-    })
+  pb.collection('ocorrencias').getFullList({
+    sort: '-numero',
+    expand: 'promotor_id,loja_id,industria_id,responsavel_id',
+    ...options,
+  })
 
 export const getOcorrencia = (id: string) =>
   pb

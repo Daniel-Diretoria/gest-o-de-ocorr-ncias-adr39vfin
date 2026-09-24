@@ -73,7 +73,7 @@ const NovaOcorrencia = () => {
     try {
       const data: any = {
         numero,
-        data_ocorrencia: `${form.data_ocorrencia} 12:00:00`,
+        data_ocorrencia: `${form.data_ocorrencia} 12:00:00.000Z`,
         promotor_id: form.promotor_id || null,
         repositor_nome: form.repositor_nome,
         loja_id: form.loja_id || null,

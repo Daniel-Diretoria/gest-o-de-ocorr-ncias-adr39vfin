@@ -47,12 +47,25 @@ routerAdd(
         '',
     )
 
+    // Identifica grupo: contact.server = g.us (grupo) ou c.us (contato direto)
+    const server = String(
+      (body.contact && (body.contact.server || body.contact.chatType)) || msg.server || '',
+    )
+    const chatId = String(
+      (body.contact && (body.contact.number || body.contact.chatId)) || msg.chatId || '',
+    )
+    const isGrupo = server.indexOf('g.us') !== -1 || chatId.indexOf('-') !== -1
+    const grupoNome = String(
+      (body.contact && (body.contact.name || body.contact.groupName)) || msg.groupName || '',
+    )
+
     // Grava a mensagem bruta sempre — rastreabilidade total.
     const col = $app.findCollectionByNameOrId('mensagens_whatsapp')
     const rec = new Record(col)
     rec.set('origem', 'umbler_talk')
     rec.set('evento', evento)
     rec.set('remetente', remetente)
+    rec.set('grupo', isGrupo ? grupoNome || chatId : '')
     rec.set('conteudo', texto)
     rec.set('payload', body)
     rec.set('processada', false)
@@ -74,6 +87,22 @@ routerAdd(
         }
       }
       return ''
+    }
+
+    // Modo grupo de ocorrências: só mensagem de GRUPO com o modelo padrão
+    // vira ocorrência — contato direto e papo solto ficam só no registro bruto.
+    const temModelo =
+      texto.toLowerCase().indexOf('situacao') !== -1 ||
+      texto.toLowerCase().indexOf('situação') !== -1 ||
+      texto.toLowerCase().indexOf('ocorrencia') !== -1 ||
+      texto.toLowerCase().indexOf('ocorrência') !== -1
+    if (!isGrupo || !temModelo) {
+      $app.save(rec)
+      return e.json(200, {
+        ok: true,
+        ignorada: true,
+        motivo: !isGrupo ? 'nao_e_grupo' : 'sem_modelo',
+      })
     }
 
     const dataStr = pega(['data'])

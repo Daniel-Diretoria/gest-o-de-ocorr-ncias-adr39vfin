@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-25T20:15:09.891Z",
+  "generatedAt": "2026-09-25T22:38:49.027Z",
   "collections": [
     {
       "name": "users",
@@ -29,21 +29,30 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         },
         {
           "name": "role",
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": ["admin", "supervisao", "promotor"]
+          "selectValues": [
+            "admin",
+            "supervisao",
+            "promotor"
+          ]
         }
       ],
       "indexes": [
@@ -79,17 +88,24 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
-      "indexes": ["CREATE INDEX idx_industrias_nome ON industrias (nome)"]
+      "indexes": [
+        "CREATE INDEX idx_industrias_nome ON industrias (nome)"
+      ]
     },
     {
       "name": "lojas",
@@ -131,17 +147,24 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
-      "indexes": ["CREATE INDEX idx_lojas_nome ON lojas (nome)"]
+      "indexes": [
+        "CREATE INDEX idx_lojas_nome ON lojas (nome)"
+      ]
     },
     {
       "name": "promotores",
@@ -191,17 +214,24 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
-      "indexes": ["CREATE INDEX idx_promotores_nome ON promotores (nome)"]
+      "indexes": [
+        "CREATE INDEX idx_promotores_nome ON promotores (nome)"
+      ]
     },
     {
       "name": "ocorrencias",
@@ -322,21 +352,35 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["baixa", "media", "alta", "critica"]
+          "selectValues": [
+            "baixa",
+            "media",
+            "alta",
+            "critica"
+          ]
         },
         {
           "name": "prioridade",
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["baixa", "media", "alta", "urgente"]
+          "selectValues": [
+            "baixa",
+            "media",
+            "alta",
+            "urgente"
+          ]
         },
         {
           "name": "visibilidade",
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["interno", "representante", "industria"]
+          "selectValues": [
+            "interno",
+            "representante",
+            "industria"
+          ]
         },
         {
           "name": "responsavel_id",
@@ -386,7 +430,10 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["whatsapp", "manual"]
+          "selectValues": [
+            "whatsapp",
+            "manual"
+          ]
         },
         {
           "name": "mensagem_bruta",
@@ -406,14 +453,19 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
       "indexes": [
@@ -453,7 +505,13 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["contato", "acao", "retorno", "observacao", "evidencia"]
+          "selectValues": [
+            "contato",
+            "acao",
+            "retorno",
+            "observacao",
+            "evidencia"
+          ]
         },
         {
           "name": "descricao",
@@ -478,17 +536,24 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         }
       ],
-      "indexes": ["CREATE INDEX idx_tratativas_ocorrencia ON tratativas (ocorrencia_id)"]
+      "indexes": [
+        "CREATE INDEX idx_tratativas_ocorrencia ON tratativas (ocorrencia_id)"
+      ]
     },
     {
       "name": "mensagens_whatsapp",
@@ -555,17 +620,30 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        },
+        {
+          "name": "grupo",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
-      "indexes": ["CREATE INDEX idx_mensagens_processada ON mensagens_whatsapp (processada)"]
+      "indexes": [
+        "CREATE INDEX idx_mensagens_processada ON mensagens_whatsapp (processada)"
+      ]
     }
   ]
 }

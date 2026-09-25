@@ -406,7 +406,8 @@ onRecordCreate((e) => {
     }
   }
 
-  if (!rec.get('sla_prazo')) {
+  const prazoAtual = String(rec.get('sla_prazo') || '')
+  if (!prazoAtual || prazoAtual.indexOf('0001-01-01') !== -1) {
     const p = String(rec.get('prioridade') || '')
     const horas = p === 'urgente' ? 4 : p === 'alta' ? 24 : p === 'baixa' ? 168 : 72
     rec.set('sla_prazo', new Date(Date.now() + horas * 3600000).toISOString().replace('T', ' '))

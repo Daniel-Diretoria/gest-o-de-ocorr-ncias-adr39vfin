@@ -170,7 +170,7 @@ routerAdd(
       $app.save(oc)
       ocorrenciaId = oc.id
       rec.set('processada', true)
-      rec.set('ocorrencia_id', ocorrencia_id_fix(ocorrenciaId))
+      rec.set('ocorrencia_id', ocorrenciaId)
     } catch (err) {
       $app.logger().error('webhook digisac: falha ao criar ocorrencia', 'error', String(err))
       rec.set('erro', String(err))

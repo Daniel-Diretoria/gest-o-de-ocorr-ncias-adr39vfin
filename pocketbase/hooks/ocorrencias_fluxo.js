@@ -43,7 +43,13 @@ onRecordCreateRequest((e) => {
 onRecordUpdateRequest((e) => {
   const rec = e.record
   const body = e.requestInfo().body || {}
-  const atual = String(rec.get('status') || '')
+  // e.record já chega com o body aplicado — o status ORIGINAL vem do banco
+  let atual = ''
+  try {
+    atual = String($app.findRecordById('ocorrencias', rec.id).get('status') || '')
+  } catch (_) {
+    atual = String(rec.get('status') || '')
+  }
   const novo = String(body.status || atual)
 
   const FECHADAS = ['resolvida', 'cancelada', 'improcedente']

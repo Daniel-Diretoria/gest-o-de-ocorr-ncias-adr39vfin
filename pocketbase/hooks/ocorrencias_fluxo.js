@@ -352,7 +352,7 @@ routerAdd(
 
 // ========= 6) Hook de modelo: IA + SLA + direcionamento em TODA criação
 // (request do frontend E gravação direta do webhook da Umbler Talk) =========
-onRecordCreate('ocorrencias', (e) => {
+onRecordCreate((e) => {
   const rec = e.record
 
   const situacao = String(rec.get('situacao') || '')
@@ -418,7 +418,7 @@ onRecordCreate('ocorrencias', (e) => {
   }
 
   e.next()
-})
+}, 'ocorrencias')
 
 // ========= 7) Cobrança automática: SLA vencido em tratativa escala para a indústria =========
 cronAdd('cobranca_sla', '*/30 * * * *', () => {

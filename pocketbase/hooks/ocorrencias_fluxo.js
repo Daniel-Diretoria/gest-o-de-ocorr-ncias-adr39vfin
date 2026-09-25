@@ -4,7 +4,7 @@
 // roda em VM que não enxerga declarações de topo).
 
 // ========= 1) Criação via API (frontend): numero, tratativa inicial =========
-onRecordCreateRequest('ocorrencias', (e) => {
+onRecordCreateRequest((e) => {
   const rec = e.record
   const body = e.requestInfo().body || {}
 
@@ -37,10 +37,10 @@ onRecordCreateRequest('ocorrencias', (e) => {
       $app.logger().warn('tratativa inicial falhou', 'error', String(err))
     }
   }
-})
+}, 'ocorrencias')
 
 // ========= 2) Atualização via API: guardas de status e fechamento com histórico =========
-onRecordUpdateRequest('ocorrencias', (e) => {
+onRecordUpdateRequest((e) => {
   const rec = e.record
   const body = e.requestInfo().body || {}
   const atual = String(rec.get('status') || '')
@@ -77,7 +77,7 @@ onRecordUpdateRequest('ocorrencias', (e) => {
   }
 
   e.next()
-})
+}, 'ocorrencias')
 
 // ========= 3) Direcionar: define responsável, SLA e classificação (supervisão/admin) =========
 routerAdd(
@@ -409,7 +409,7 @@ onRecordCreate((e) => {
   if (!rec.get('sla_prazo')) {
     const p = String(rec.get('prioridade') || '')
     const horas = p === 'urgente' ? 4 : p === 'alta' ? 24 : p === 'baixa' ? 168 : 72
-    rec.set('sla_prazo', new Date(Date.now() + horas * 3600000).toISOString())
+    rec.set('sla_prazo', new Date(Date.now() + horas * 3600000).toISOString().replace('T', ' '))
   }
 
   const st = String(rec.get('status') || 'nova')

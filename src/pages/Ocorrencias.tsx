@@ -13,7 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card, CardContent } from '@/components/ui/card'
-import { Plus, Search } from 'lucide-react'
+import { Button as Btn } from '@/components/ui/button'
+import { Plus, Search, Target } from 'lucide-react'
 
 const Ocorrencias = () => {
   const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>([])
@@ -83,9 +84,14 @@ const Ocorrencias = () => {
             {ocorrencias.length} registradas · {abertas} abertas
           </p>
         </div>
-        <Button onClick={() => navigate('/ocorrencias/nova')}>
-          <Plus className="h-4 w-4 mr-2" /> Nova ocorrência
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => navigate('/painel')}>
+            <Target className="h-4 w-4 mr-2" /> Painel
+          </Button>
+          <Button onClick={() => navigate('/ocorrencias/nova')}>
+            <Plus className="h-4 w-4 mr-2" /> Nova ocorrência
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">
@@ -135,6 +141,7 @@ const Ocorrencias = () => {
                     <th className="p-3 font-medium">Situação</th>
                     <th className="p-3 font-medium">Categoria</th>
                     <th className="p-3 font-medium">Status</th>
+                    <th className="p-3 font-medium">SLA</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -156,6 +163,22 @@ const Ocorrencias = () => {
                       </td>
                       <td className="p-3">
                         <StatusBadge status={o.status} />
+                      </td>
+                      <td className="p-3 whitespace-nowrap text-xs">
+                        {o.sla_prazo ? (
+                          <span
+                            className={
+                              !['resolvida', 'cancelada', 'improcedente'].includes(o.status) &&
+                              new Date(o.sla_prazo) < new Date()
+                                ? 'text-amber-600 font-medium'
+                                : ''
+                            }
+                          >
+                            {fmtData(o.sla_prazo)}
+                          </span>
+                        ) : (
+                          '—'
+                        )}
                       </td>
                     </tr>
                   ))}

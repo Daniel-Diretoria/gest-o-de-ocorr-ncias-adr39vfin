@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { User, LogOut, LayoutDashboard, ClipboardList, Settings } from 'lucide-react'
+import { User, LogOut, LayoutDashboard, ClipboardList, Settings, BarChart3 } from 'lucide-react'
 
 const roleLabel: Record<string, string> = {
   admin: 'Administrador',
@@ -26,6 +26,7 @@ export default function Layout() {
   const navItems = [
     { to: '/', label: 'Início', icon: LayoutDashboard },
     { to: '/ocorrencias', label: 'Ocorrências', icon: ClipboardList },
+    { to: '/painel', label: 'Painel', icon: BarChart3 },
     { to: '/cadastros', label: 'Cadastros', icon: Settings },
   ]
 

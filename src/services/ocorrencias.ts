@@ -153,3 +153,59 @@ export const getMensagens = (options?: any) =>
 
 // ===== URL de arquivo =====
 export const fileUrl = (record: any, filename: string) => pb.files.getURL(record, filename)
+
+// ===== Fase 2: direcionamento, sugestão IA e dashboard =====
+export interface SugestaoClassificacao {
+  categoria?: string
+  gravidade?: string
+  prioridade?: string
+  visibilidade?: string
+  justificativa?: string
+}
+
+export const sugerirClassificacao = (id: string) =>
+  pb.send<SugestaoClassificacao>(`/backend/v1/ocorrencias/${id}/sugerir-classificacao`, {
+    method: 'POST',
+  })
+
+export const direcionarOcorrencia = (
+  id: string,
+  data: {
+    responsavel_id?: string
+    sla_prazo?: string
+    prioridade?: string
+    gravidade?: string
+    visibilidade?: string
+    categoria?: string
+  },
+) => pb.send(`/backend/v1/ocorrencias/${id}/direcionar`, { method: 'POST', body: data })
+
+export interface DashboardData {
+  abertas: number
+  resolvidas: number
+  fora_sla: number
+  proximas_24h: number
+  sem_prazo: number
+  apoio: number
+  resolvidas_no_prazo: number
+  resolvidas_com_prazo: number
+  tempo_medio_primeira_acao_min: number | null
+  tempo_medio_resolucao_min: number | null
+  por_status: Record<string, number>
+  por_categoria: Record<string, number>
+  por_industria: Array<{ nome: string; qtd: number }>
+  pendencias: Array<{
+    id: string
+    numero: number
+    loja: string
+    industria: string
+    status: string
+    prazo: string
+    situacao: string
+  }>
+}
+
+export const getDashboard = () => pb.send<DashboardData>('/backend/v1/dashboard', { method: 'GET' })
+
+export const getUsuarios = () =>
+  pb.collection('users').getFullList({ sort: 'name', fields: 'id,name,email,role' })

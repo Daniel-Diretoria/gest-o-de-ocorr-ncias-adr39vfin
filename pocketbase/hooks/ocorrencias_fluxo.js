@@ -427,6 +427,34 @@ onRecordCreate((e) => {
   e.next()
 }, 'ocorrencias')
 
+// ========= 8) Promotor vê só as ocorrências dele (filtro na listagem) =========
+onRecordsListRequest((e) => {
+  const auth = e.auth
+  const role = (auth && String(auth.get('role') || '')) || ''
+  if (role !== 'promotor') {
+    e.next()
+    return
+  }
+  let promotorId = ''
+  try {
+    const ps = $app.findRecordsByFilter('promotores', 'user_id = {:uid}', '', 1, 0, {
+      uid: auth.id,
+    })
+    if (ps && ps.length > 0) promotorId = ps[0].id
+  } catch (_) {}
+
+  const filtroOrigem = e.requestInfo().query['filter'] || ''
+  const filtroMeus = '(promotor_id = {:pid} || repositor_nome ~ {:nome})'
+  e.requestInfo().query['filter'] = filtroOrigem
+    ? '(' + filtroOrigem + ') && ' + filtroMeus
+    : filtroMeus
+  e.requestInfo().query['params'] = JSON.stringify({
+    pid: promotorId || '__nenhum__',
+    nome: auth.get('name') || '',
+  })
+  e.next()
+}, 'ocorrencias')
+
 // ========= 7) Cobrança automática: SLA vencido em tratativa escala para a indústria =========
 cronAdd('cobranca_sla', '*/30 * * * *', () => {
   const limite = new Date().toISOString().replace('T', ' ')

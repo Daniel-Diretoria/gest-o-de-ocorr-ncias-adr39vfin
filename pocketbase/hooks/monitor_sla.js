@@ -5,25 +5,15 @@
 //
 // Lógica por ocorrência aberta (nova/em_analise/direcionada/em_tratativa/
 // aguardando_*):
-//   sem resposta nenhuma + SLA vencido            → lembrete URGENTE (1º)
+//   sem resposta nenhuma + SLA vencido            → lembrete (1º)
 //   sem resposta nenhuma + SLA vence em <24h      → lembrete de prazo
-//   tratativas existem + última > SLA combinado   → lembrete de retorno
+//   tratativas existem + última passou do SLA     → lembrete de retorno
 //   última tratativa > 2x SLA (ou 7 dias)         → escala: aguardando_industria
 //   ocorrência com representante e sem autorização → lembrete p/ representante
-// Anti-spam: 1 lembrete a cada 12h por ocorrência (lembretes_enviados + created).
-
-var monitorSlaExecutando = false
+// Anti-spam: 1 lembrete a cada 12h por ocorrência.
+// Tudo inline no callback: o JSVM roda callbacks em VM separada, sem acesso a
+// declarações de topo.
 cronAdd('monitor_sla_ia', '*/20 * * * *', () => {
-  if (monitorSlaExecutando) return
-  monitorSlaExecutando = true
-  try {
-    executarMonitor()
-  } finally {
-    monitorSlaExecutando = false
-  }
-})
-
-function executarMonitor() {
   const agora = Date.now()
   const FECHADAS = ['resolvida', 'cancelada', 'improcedente']
 
@@ -194,10 +184,4 @@ function executarMonitor() {
   if (gerados > 0 || escaladas > 0) {
     $app.logger().info('monitor_sla_ia: ' + gerados + ' lembrete(s), ' + escaladas + ' escalada(s)')
   }
-}
-
-// helper para evitar warning de variável não usada
-function monitor_sla_ref() {
-  return monitorSlaExecutando
-}
-monitor_sla_ref()
+})

@@ -14,6 +14,7 @@ import NovaOcorrencia from './pages/NovaOcorrencia'
 import Cadastros from './pages/Cadastros'
 import Painel from './pages/Painel'
 import Direcionar from './pages/Direcionar'
+import EditarOcorrencia from './pages/EditarOcorrencia'
 import Perfil from './pages/Perfil'
 import NotFound from './pages/NotFound'
 
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/cadastros" element={<Cadastros />} />
             <Route path="/painel" element={<Painel />} />
             <Route path="/ocorrencias/:id/direcionar" element={<Direcionar />} />
+            <Route path="/ocorrencias/:id/editar" element={<EditarOcorrencia />} />
             <Route path="/perfil" element={<Perfil />} />
           </Route>
           <Route path="*" element={<NotFound />} />

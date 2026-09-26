@@ -30,9 +30,15 @@ import {
   MensagemWhats,
 } from '@/services/ocorrencias'
 import { useRealtime } from '@/hooks/use-realtime'
-import { Trash2, UserPlus } from 'lucide-react'
+import { Trash2, UserPlus, Upload } from 'lucide-react'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
-import { getUsuarios, createUsuario, deleteUsuario, Usuario } from '@/services/ocorrencias'
+import {
+  getUsuarios,
+  createUsuario,
+  deleteUsuario,
+  Usuario,
+  importarConversa,
+} from '@/services/ocorrencias'
 
 const Cadastros = () => {
   const { isAdmin } = useAuth()
@@ -89,6 +95,34 @@ const Cadastros = () => {
         setErro(getErrorMessage(err))
       }
     }
+  }
+
+  const importar = async (texto: string) => {
+    if (!texto.trim()) {
+      setErro('Cole o texto da conversa exportada ou selecione o arquivo .txt.')
+      return
+    }
+    setImportando(true)
+    setErro('')
+    setResultadoImport('')
+    try {
+      const r: any = await importarConversa(texto)
+      setResultadoImport(
+        `Importado: ${r.ocorrencias_criadas} ocorrências criadas de ${r.mensagens_reconhecidas} mensagens reconhecidas (${r.ignoradas} ignoradas — sem o modelo padrão).`,
+      )
+      setConversa('')
+    } catch (err: any) {
+      setErro(err?.message || 'Erro na importação.')
+    } finally {
+      setImportando(false)
+    }
+  }
+
+  const lerArquivo = (f: File | null) => {
+    if (!f) return
+    const reader = new FileReader()
+    reader.onload = () => importar(String(reader.result || ''))
+    reader.readAsText(f, 'utf-8')
   }
 
   useEffect(() => {
@@ -161,6 +195,7 @@ const Cadastros = () => {
           <TabsTrigger value="promotores">Promotores ({promotores.length})</TabsTrigger>
           <TabsTrigger value="mensagens">Mensagens WhatsApp ({mensagens.length})</TabsTrigger>
           {isAdmin && <TabsTrigger value="usuarios">Usuários ({usuarios.length})</TabsTrigger>}
+          <TabsTrigger value="importar">Importar conversa</TabsTrigger>
         </TabsList>
 
         <TabsContent value="industrias" className="space-y-4">
@@ -417,6 +452,38 @@ const Cadastros = () => {
                   {m.erro && <p className="text-xs text-destructive">{m.erro}</p>}
                 </div>
               ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="importar" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">
+                Importar conversa do grupo (export do WhatsApp)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                No WhatsApp: segure o grupo &gt; Mais &gt; Exportar conversa &gt; Sem mídia. Envie o
+                arquivo .txt aqui — cada mensagem no modelo padrão vira uma ocorrência com IA e SLA.
+              </p>
+              <Input
+                type="file"
+                accept=".txt,text/plain"
+                onChange={(e) => lerArquivo(e.target.files?.[0] || null)}
+              />
+              <Textarea
+                value={conversa}
+                onChange={(e) => setConversa(e.target.value)}
+                rows={8}
+                placeholder="...ou cole o texto da conversa exportada aqui"
+              />
+              <Button type="button" onClick={() => importar(conversa)} disabled={importando}>
+                <Upload className="h-4 w-4 mr-2" />
+                {importando ? 'Importando...' : 'Importar ocorrências'}
+              </Button>
+              {resultadoImport && <p className="text-sm text-green-600">{resultadoImport}</p>}
             </CardContent>
           </Card>
         </TabsContent>

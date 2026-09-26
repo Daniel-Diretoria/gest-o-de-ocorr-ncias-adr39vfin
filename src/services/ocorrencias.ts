@@ -207,6 +207,12 @@ export interface DashboardData {
 
 export const getDashboard = () => pb.send<DashboardData>('/backend/v1/dashboard', { method: 'GET' })
 
+export const importarConversa = (conversa: string) =>
+  pb.send('/backend/v1/ocorrencias/importar-conversa', {
+    method: 'POST',
+    body: { conversa },
+  })
+
 export const getUsuarios = () =>
   pb.collection('users').getFullList({ sort: 'name', fields: 'id,name,email,role,created' })
 

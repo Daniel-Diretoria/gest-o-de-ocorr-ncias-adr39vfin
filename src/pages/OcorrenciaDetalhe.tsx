@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ArrowLeft, Paperclip, Send, Target } from 'lucide-react'
+import { ArrowLeft, Paperclip, Send, Target, Pencil } from 'lucide-react'
 
 const TIPOS = ['contato', 'acao', 'retorno', 'observacao', 'evidencia']
 
@@ -162,9 +162,17 @@ const OcorrenciaDetalhe = () => {
             </SelectContent>
           </Select>
           {(isAdmin || user?.role === 'supervisao') && (
-            <Button variant="outline" onClick={() => navigate(`/ocorrencias/${oc.id}/direcionar`)}>
-              <Target className="h-4 w-4 mr-2" /> Direcionar
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                onClick={() => navigate(`/ocorrencias/${oc.id}/direcionar`)}
+              >
+                <Target className="h-4 w-4 mr-2" /> Direcionar
+              </Button>
+              <Button variant="outline" onClick={() => navigate(`/ocorrencias/${oc.id}/editar`)}>
+                <Pencil className="h-4 w-4 mr-2" /> Editar
+              </Button>
+            </>
           )}
         </div>
       )}

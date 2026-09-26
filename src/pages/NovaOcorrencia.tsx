@@ -41,7 +41,9 @@ const NovaOcorrencia = () => {
     promotor_id: '',
     repositor_nome: '',
     loja_id: '',
+    loja_nome: '',
     industria_id: '',
+    industria_nome: '',
     produto: '',
     situacao: '',
     acao_realizada: '',
@@ -77,7 +79,9 @@ const NovaOcorrencia = () => {
         promotor_id: form.promotor_id || null,
         repositor_nome: form.repositor_nome,
         loja_id: form.loja_id || null,
+        loja_nome: form.loja_nome,
         industria_id: form.industria_id || null,
+        industria_nome: form.industria_nome,
         produto: form.produto,
         situacao: form.situacao.trim(),
         acao_realizada: form.acao_realizada,
@@ -158,10 +162,10 @@ const NovaOcorrencia = () => {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Loja</Label>
+              <Label>Loja (cadastrada)</Label>
               <Select value={form.loja_id} onValueChange={(v) => set('loja_id', v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione" />
+                  <SelectValue placeholder="Opcional" />
                 </SelectTrigger>
                 <SelectContent>
                   {lojas.map((l) => (
@@ -173,10 +177,18 @@ const NovaOcorrencia = () => {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Indústria</Label>
+              <Label>Nome da loja (livre)</Label>
+              <Input
+                value={form.loja_nome}
+                onChange={(e) => set('loja_nome', e.target.value)}
+                placeholder="Ex.: Angeloni Centro"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Indústria (cadastrada)</Label>
               <Select value={form.industria_id} onValueChange={(v) => set('industria_id', v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione" />
+                  <SelectValue placeholder="Opcional" />
                 </SelectTrigger>
                 <SelectContent>
                   {industrias.map((i) => (
@@ -186,6 +198,14 @@ const NovaOcorrencia = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Nome da indústria (livre)</Label>
+              <Input
+                value={form.industria_nome}
+                onChange={(e) => set('industria_nome', e.target.value)}
+                placeholder="Ex.: Italac"
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Produto</Label>

@@ -49,7 +49,7 @@ routerAdd(
     if (role !== 'admin' && role !== 'supervisao') {
       return e.json(403, { error: 'Sem permissão.' })
     }
-    const n = $app.findRecordsByFilter('ia_treino', '', '-created', 1, 0).length
+    const n = $app.findRecordsByFilter('ia_treino', '', '-created', 500, 0).length
     return e.json(200, { exemplos: n })
   },
   $apis.requireAuth(),

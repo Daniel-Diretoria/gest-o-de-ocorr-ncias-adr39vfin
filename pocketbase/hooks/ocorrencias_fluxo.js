@@ -354,6 +354,14 @@ routerAdd(
       por_status: porStatus,
       por_categoria: porCategoria,
       por_industria: topIndustrias,
+      por_area: porArea,
+      por_responsavel: Object.keys(porResponsavel)
+        .map((nome) => ({
+          responsavel: nome,
+          abertas: porResponsavel[nome],
+          fora_sla: (respPend[nome] && respPend[nome].fora_sla) || 0,
+        }))
+        .sort((a, b) => b.abertas - a.abertas),
       pendencias: pendencias.slice(0, 10),
     })
   },

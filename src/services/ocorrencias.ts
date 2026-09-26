@@ -274,6 +274,8 @@ export interface DashboardData {
   tempo_medio_resolucao_min: number | null
   por_status: Record<string, number>
   por_categoria: Record<string, number>
+  por_area?: Record<string, number>
+  por_responsavel?: Array<{ responsavel: string; abertas: number; fora_sla: number }>
   por_industria: Array<{ nome: string; qtd: number }>
   pendencias: Array<{
     id: string

@@ -261,6 +261,9 @@ routerAdd(
     const porStatus = {}
     const porCategoria = {}
     const porIndustria = {}
+    const porArea = {}
+    const porResponsavel = {}
+    const respPend = {}
     const pendencias = []
 
     for (let i = 0; i < ocs.length; i++) {

@@ -112,6 +112,20 @@ const Painel = () => {
     qtd: v,
   }))
 
+  const areaLabels: Record<string, string> = {
+    io: 'IO (Rhuan)',
+    operacao_loja: 'Operação loja (Fernando)',
+    merchandising: 'Merchandising (Felipe)',
+    pontos_extras: 'Pontos extras (Gabriels/Arthur)',
+    acesso_loja: 'Acesso/QR (Carol)',
+    outro: 'Outro',
+    sem_area: 'Sem área',
+  }
+  const areaChart = Object.entries(data.por_area || {}).map(([k, v]) => ({
+    nome: areaLabels[k] || k,
+    qtd: v,
+  }))
+
   return (
     <div className="space-y-6">
       <div>
@@ -181,6 +195,48 @@ const Painel = () => {
             ) : (
               <GraficoBarras data={catChart} />
             )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Abertas por área (IO)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {areaChart.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Sem dados ainda.</p>
+            ) : (
+              <GraficoBarras data={areaChart} />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Responsáveis — abertas e fora do SLA</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {(data.por_responsavel || []).length === 0 && (
+              <p className="text-sm text-muted-foreground">Sem dados ainda.</p>
+            )}
+            {(data.por_responsavel || []).map((r) => (
+              <div
+                key={r.responsavel}
+                className="flex items-center justify-between text-sm border-b last:border-0 pb-2 last:pb-0"
+              >
+                <span className="font-medium">{r.responsavel}</span>
+                <span className="flex items-center gap-3">
+                  <span className="text-muted-foreground text-xs">{r.abertas} aberta(s)</span>
+                  {r.fora_sla > 0 && (
+                    <span className="text-amber-600 text-xs font-medium">
+                      {r.fora_sla} fora do SLA
+                    </span>
+                  )}
+                </span>
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>

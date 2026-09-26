@@ -19,9 +19,11 @@ routerAdd(
     }
 
     // 1) Divide a conversa em mensagens (timestamp + autor + texto)
+    // Formatos: Android "DD/MM/AAAA HH:MM - Autor: msg" e iOS
+    // "[M/D/AA, H:MM:SS PM] - Autor: msg" (12h, mês/dia conforme locale do aparelho).
     const linhas = conversa.split('\n')
     const reInicio =
-      /^\[?(\d{1,2})\/(\d{1,2})\/(\d{2,4})[ ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?\]?\s*[-–]\s*([^:]{1,60}):\s?([\s\S]*)$/
+      /^\[?(\d{1,2})\/(\d{1,2})\/(\d{2,4})[ ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(?:([AaPp])\.?[Mm]\.?)?\s*\]?\s*[-–]\s*([^:]{1,60}):\s?([\s\S]*)$/
     const mensagens = []
     let atual = null
     for (let i = 0; i < linhas.length; i++) {
@@ -30,12 +32,15 @@ routerAdd(
       if (m) {
         if (atual) mensagens.push(atual)
         atual = {
-          dia: m[1],
-          mes: m[2],
+          d1: m[1],
+          d2: m[2],
           ano: m[3],
-          hora: m[4] + ':' + m[5],
-          autor: m[7].trim(),
-          texto: m[8] || '',
+          hora: Number(m[4]),
+          min: m[5],
+          seg: m[6] || '00',
+          ampm: (m[7] || '').toUpperCase(),
+          autor: m[8].trim(),
+          texto: m[9] || '',
         }
       } else if (atual) {
         atual.texto += '\n' + linha
@@ -48,6 +53,22 @@ routerAdd(
         error:
           'Nenhuma mensagem reconhecida. Use a conversa exportada do WhatsApp (Opções do grupo > Mais > Exportar conversa).',
       })
+    }
+
+    // Ordem do dia/mês: se alguma linha tem segundo campo > 12 é M/D (iOS US);
+    // se o primeiro > 12 é D/M (BR). Padrão: M/D (formato observado no export).
+    let ordemMD = true
+    for (let i = 0; i < mensagens.length; i++) {
+      const a = Number(mensagens[i].d1)
+      const b = Number(mensagens[i].d2)
+      if (b > 12) {
+        ordemMD = true
+        break
+      }
+      if (a > 12) {
+        ordemMD = false
+        break
+      }
     }
 
     // 2) Para cada mensagem com o modelo padrão, cria a ocorrência
@@ -94,12 +115,19 @@ routerAdd(
         ignoradas++
         continue
       }
+      // Modelo colado em branco (só os rótulos) não vira ocorrência —
+      // exige Situação encontrada preenchida.
+      const situacaoPre = pega(texto, ['situa', 'ocorr', 'problema'])
+      if (!situacaoPre) {
+        ignoradas++
+        continue
+      }
 
       const repositor = pega(texto, ['repositor', 'promotor']) || m.autor
       const loja = pega(texto, ['loja'])
       const industria = pega(texto, ['industria', 'indústria', 'cliente'])
       const produto = pega(texto, ['produto'])
-      const situacao = pega(texto, ['situa', 'ocorr', 'problema']) || texto.substring(0, 500)
+      const situacao = situacaoPre
       const acao = pega(texto, [
         'ja foi feito',
         'já foi feito',
@@ -111,17 +139,28 @@ routerAdd(
       const apoioLinha = pega(texto, ['precisa de apoio', 'apoio'])
       const precisaApoio = apoioLinha ? /sim|yes|true/i.test(apoioLinha) : false
 
+      // Data/hora da MENSAGEM (não do campo Data do modelo, que às vezes falta
+      // ou vem errado). AM/PM do iOS: 12 AM = 0h, 12 PM = 12h, PM += 12.
       let ano = m.ano
       if (ano.length === 2) ano = '20' + ano
+      let mes = ordemMD ? m.d1 : m.d2
+      let dia = ordemMD ? m.d2 : m.d1
+      let hora = m.hora
+      if (m.ampm === 'PM' && hora < 12) hora += 12
+      if (m.ampm === 'AM' && hora === 12) hora = 0
       const dataOcorrencia =
         ano +
         '-' +
-        m.mes.padStart(2, '0') +
+        mes.padStart(2, '0') +
         '-' +
-        m.dia.padStart(2, '0') +
+        dia.padStart(2, '0') +
         ' ' +
-        m.hora +
-        ':00.000Z'
+        String(hora).padStart(2, '0') +
+        ':' +
+        m.min +
+        ':' +
+        m.seg +
+        '.000Z'
 
       // Classificação IA (falha silenciosa — importação continua)
       let categoria = ''

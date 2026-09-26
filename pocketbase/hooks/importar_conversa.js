@@ -23,7 +23,7 @@ routerAdd(
     // "[M/D/AA, H:MM:SS PM] - Autor: msg" (12h, mês/dia conforme locale do aparelho).
     const linhas = conversa.split('\n')
     const reInicio =
-      /^\[?(\d{1,2})\/(\d{1,2})\/(\d{2,4})[ ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(?:([AaPp])\.?[Mm]\.?)?\s*\]?\s*[-–]\s*([^:]{1,60}):\s?([\s\S]*)$/
+      /^\[?(\d{1,2})\/(\d{1,2})\/(\d{2,4})[ ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(?:([AaPp])\.?[Mm]\.?)?\s*\]?\s*(?:[-–]\s*)?([^:]{1,60}):\s?([\s\S]*)$/
     const mensagens = []
     let atual = null
     for (let i = 0; i < linhas.length; i++) {

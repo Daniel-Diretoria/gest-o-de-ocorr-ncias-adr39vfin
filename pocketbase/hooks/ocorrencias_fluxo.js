@@ -292,6 +292,15 @@ routerAdd(
         const cat = String(o.get('categoria') || '') || 'sem_classificacao'
         porCategoria[cat] = (porCategoria[cat] || 0) + 1
 
+        // IO — agregação por área e por responsável esperado
+        const area = String(o.get('area') || '') || 'sem_area'
+        porArea[area] = (porArea[area] || 0) + 1
+        const resp = String(o.get('responsavel_nome') || '') || 'sem_responsavel'
+        porResponsavel[resp] = (porResponsavel[resp] || 0) + 1
+        if (!respPend[resp]) respPend[resp] = { abertas: 0, fora_sla: 0 }
+        respPend[resp].abertas++
+        if (atrasada) respPend[resp].fora_sla++
+
         const ind =
           String(o.get('industria_nome') || '') ||
           indNome[String(o.get('industria_id') || '')] ||

@@ -654,6 +654,7 @@ const Cadastros = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="promotor">Promotor</SelectItem>
+                      <SelectItem value="representante">Representante</SelectItem>
                       <SelectItem value="supervisao">Supervisão</SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>
                     </SelectContent>

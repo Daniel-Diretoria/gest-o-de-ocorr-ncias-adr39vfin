@@ -38,10 +38,20 @@ routerAdd(
           hora: Number(m[4]),
           min: m[5],
           seg: m[6] || '00',
-          ampm: (m[7] || '').toUpperCase(),
+          ampm:
+            (m[7] || '').toUpperCase() === 'P'
+              ? 'PM'
+              : (m[7] || '').toUpperCase() === 'A'
+                ? 'AM'
+                : '',
           autor: m[8].trim(),
           texto: m[9] || '',
         }
+      } else if (atual && /^\[?\d{1,2}\/\d{1,2}\/\d{2,4}[ ,]+\d{1,2}:\d{2}/.test(linha)) {
+        // Linha com timestamp mas sem "Autor:" (notificação do sistema) —
+        // fecha a mensagem anterior e não vira conteúdo.
+        mensagens.push(atual)
+        atual = null
       } else if (atual) {
         atual.texto += '\n' + linha
       }

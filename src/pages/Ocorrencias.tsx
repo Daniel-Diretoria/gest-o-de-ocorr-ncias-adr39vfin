@@ -16,11 +16,22 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button as Btn } from '@/components/ui/button'
 import { Plus, Search, Target } from 'lucide-react'
 
+const AREAS = [
+  { valor: 'io', label: 'IO (Rhuan)' },
+  { valor: 'operacao_loja', label: 'Operação de loja (Fernando)' },
+  { valor: 'merchandising', label: 'Merchandising (Felipe)' },
+  { valor: 'pontos_extras', label: 'Pontos extras (Gabriels e Arthur)' },
+  { valor: 'acesso_loja', label: 'Acesso/QR Code (Carol)' },
+  { valor: 'outro', label: 'Outro' },
+]
+
 const Ocorrencias = () => {
   const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>([])
   const [loading, setLoading] = useState(true)
   const [busca, setBusca] = useState('')
   const [statusFiltro, setStatusFiltro] = useState('todos')
+  const [areaFiltro, setAreaFiltro] = useState('todas')
+  const [respFiltro, setRespFiltro] = useState('todos')
   const navigate = useNavigate()
 
   const loadData = async () => {
@@ -52,6 +63,12 @@ const Ocorrencias = () => {
     if (statusFiltro !== 'todos') {
       list = list.filter((o) => o.status === statusFiltro)
     }
+    if (areaFiltro !== 'todas') {
+      list = list.filter((o) => (o.area || 'outro') === areaFiltro)
+    }
+    if (respFiltro !== 'todos') {
+      list = list.filter((o) => (o.responsavel_nome || '').toLowerCase().indexOf(respFiltro) !== -1)
+    }
     if (busca.trim()) {
       const q = busca.toLowerCase()
       list = list.filter(
@@ -64,7 +81,7 @@ const Ocorrencias = () => {
       )
     }
     return list
-  }, [ocorrencias, busca, statusFiltro])
+  }, [ocorrencias, busca, statusFiltro, areaFiltro, respFiltro])
 
   const fmtData = (d?: string) => {
     if (!d) return '—'
@@ -105,7 +122,7 @@ const Ocorrencias = () => {
           />
         </div>
         <Select value={statusFiltro} onValueChange={setStatusFiltro}>
-          <SelectTrigger className="w-full sm:w-56">
+          <SelectTrigger className="w-full sm:w-44">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -115,6 +132,32 @@ const Ocorrencias = () => {
                 {label}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+        <Select value={areaFiltro} onValueChange={setAreaFiltro}>
+          <SelectTrigger className="w-full sm:w-52">
+            <SelectValue placeholder="Área" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas as áreas</SelectItem>
+            {AREAS.map((a) => (
+              <SelectItem key={a.valor} value={a.valor}>
+                {a.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={respFiltro} onValueChange={setRespFiltro}>
+          <SelectTrigger className="w-full sm:w-40">
+            <SelectValue placeholder="Responsável" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos responsáveis</SelectItem>
+            <SelectItem value="rhuan">Rhuan</SelectItem>
+            <SelectItem value="fernando">Fernando</SelectItem>
+            <SelectItem value="felipe">Felipe</SelectItem>
+            <SelectItem value="gabriel">Gabriel/Arthur</SelectItem>
+            <SelectItem value="carol">Carol</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -140,6 +183,7 @@ const Ocorrencias = () => {
                     <th className="p-3 font-medium">Indústria</th>
                     <th className="p-3 font-medium">Situação</th>
                     <th className="p-3 font-medium">Categoria</th>
+                    <th className="p-3 font-medium">Responsável</th>
                     <th className="p-3 font-medium">Status</th>
                     <th className="p-3 font-medium">SLA</th>
                   </tr>
@@ -161,6 +205,7 @@ const Ocorrencias = () => {
                       <td className="p-3">
                         {o.categoria ? CATEGORIA_LABELS[o.categoria] || o.categoria : '—'}
                       </td>
+                      <td className="p-3 text-xs">{o.responsavel_nome || '—'}</td>
                       <td className="p-3">
                         <StatusBadge status={o.status} />
                       </td>

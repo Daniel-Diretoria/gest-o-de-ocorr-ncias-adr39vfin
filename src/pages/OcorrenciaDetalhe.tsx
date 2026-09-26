@@ -6,10 +6,12 @@ import {
   createTratativa,
   updateOcorrencia,
   getLembretes,
+  getTimeline,
   autorizarRepresentante,
   Ocorrencia as OcType,
   Tratativa,
   Lembrete,
+  TimelineData,
   fileUrl,
 } from '@/services/ocorrencias'
 import { useAuth } from '@/hooks/use-auth'
@@ -52,6 +54,7 @@ const OcorrenciaDetalhe = () => {
   const [evidencia, setEvidencia] = useState<File | null>(null)
   const [enviando, setEnviando] = useState(false)
   const [lembretes, setLembretes] = useState<Lembrete[]>([])
+  const [timeline, setTimeline] = useState<TimelineData | null>(null)
 
   const loadData = async () => {
     if (!id) return
@@ -62,6 +65,9 @@ const OcorrenciaDetalhe = () => {
       setTratativas(t as any)
       getLembretes(id)
         .then((l) => setLembretes(l as any))
+        .catch(() => {})
+      getTimeline(id)
+        .then((t) => setTimeline(t as any))
         .catch(() => {})
     } finally {
       setLoading(false)
@@ -319,6 +325,50 @@ const OcorrenciaDetalhe = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Timeline — onde está parado, com qual responsável */}
+      {timeline && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              Linha do tempo — parado com:{' '}
+              <span className="text-primary">{timeline.parado_com}</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ol className="relative border-l ml-3 space-y-4">
+              {timeline.eventos.map((ev, idx) => (
+                <li key={idx} className="ml-4">
+                  <span className="absolute -left-1.5 h-3 w-3 rounded-full border-2 border-background bg-primary/70" />
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <Badge
+                      variant={
+                        ev.tipo === 'criacao'
+                          ? 'default'
+                          : ev.tipo === 'lembrete'
+                            ? 'destructive'
+                            : ev.tipo === 'sla'
+                              ? 'secondary'
+                              : 'outline'
+                      }
+                    >
+                      {ev.tipo}
+                    </Badge>
+                    <span>{fmtData(ev.quando)}</span>
+                    {ev.autor && <span>· {ev.autor}</span>}
+                  </div>
+                  <p className="text-sm font-medium mt-0.5">{ev.titulo}</p>
+                  {ev.detalhe && (
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {ev.detalhe}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

@@ -29,31 +29,21 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         },
         {
           "name": "role",
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": [
-            "admin",
-            "supervisao",
-            "promotor",
-            "representante"
-          ]
+          "selectValues": ["admin", "supervisao", "promotor", "representante"]
         }
       ],
       "indexes": [
@@ -89,24 +79,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE INDEX idx_industrias_nome ON industrias (nome)"
-      ]
+      "indexes": ["CREATE INDEX idx_industrias_nome ON industrias (nome)"]
     },
     {
       "name": "lojas",
@@ -148,24 +131,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE INDEX idx_lojas_nome ON lojas (nome)"
-      ]
+      "indexes": ["CREATE INDEX idx_lojas_nome ON lojas (nome)"]
     },
     {
       "name": "promotores",
@@ -215,24 +191,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE INDEX idx_promotores_nome ON promotores (nome)"
-      ]
+      "indexes": ["CREATE INDEX idx_promotores_nome ON promotores (nome)"]
     },
     {
       "name": "ocorrencias",
@@ -354,35 +323,21 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "baixa",
-            "media",
-            "alta",
-            "critica"
-          ]
+          "selectValues": ["baixa", "media", "alta", "critica"]
         },
         {
           "name": "prioridade",
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "baixa",
-            "media",
-            "alta",
-            "urgente"
-          ]
+          "selectValues": ["baixa", "media", "alta", "urgente"]
         },
         {
           "name": "visibilidade",
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "interno",
-            "representante",
-            "industria"
-          ]
+          "selectValues": ["interno", "representante", "industria"]
         },
         {
           "name": "responsavel_id",
@@ -432,10 +387,7 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "whatsapp",
-            "manual"
-          ]
+          "selectValues": ["whatsapp", "manual"]
         },
         {
           "name": "mensagem_bruta",
@@ -455,19 +407,14 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         },
         {
           "name": "acompanhamento_industria",
@@ -519,11 +466,7 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "interno",
-            "representante",
-            "industria"
-          ]
+          "selectValues": ["interno", "representante", "industria"]
         }
       ],
       "indexes": [
@@ -563,13 +506,7 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "contato",
-            "acao",
-            "retorno",
-            "observacao",
-            "evidencia"
-          ]
+          "selectValues": ["contato", "acao", "retorno", "observacao", "evidencia"]
         },
         {
           "name": "descricao",
@@ -594,24 +531,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE INDEX idx_tratativas_ocorrencia ON tratativas (ocorrencia_id)"
-      ]
+      "indexes": ["CREATE INDEX idx_tratativas_ocorrencia ON tratativas (ocorrencia_id)"]
     },
     {
       "name": "mensagens_whatsapp",
@@ -678,19 +608,14 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         },
         {
           "name": "grupo",
@@ -699,9 +624,7 @@
           "system": false
         }
       ],
-      "indexes": [
-        "CREATE INDEX idx_mensagens_processada ON mensagens_whatsapp (processada)"
-      ]
+      "indexes": ["CREATE INDEX idx_mensagens_processada ON mensagens_whatsapp (processada)"]
     },
     {
       "name": "representantes",
@@ -757,24 +680,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE INDEX idx_representantes_nome ON representantes (nome)"
-      ]
+      "indexes": ["CREATE INDEX idx_representantes_nome ON representantes (nome)"]
     },
     {
       "name": "lembretes",
@@ -799,11 +715,7 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "promotor",
-            "responsavel",
-            "representante"
-          ]
+          "selectValues": ["promotor", "responsavel", "representante"]
         },
         {
           "name": "destinatario_nome",
@@ -828,11 +740,7 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "pendente",
-            "enviado",
-            "erro"
-          ]
+          "selectValues": ["pendente", "enviado", "erro"]
         },
         {
           "name": "erro",
@@ -851,24 +759,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE INDEX idx_lembretes_status ON lembretes (status)"
-      ]
+      "indexes": ["CREATE INDEX idx_lembretes_status ON lembretes (status)"]
     },
     {
       "name": "ia_treino",
@@ -930,24 +831,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE INDEX idx_ia_treino_created ON ia_treino (created)"
-      ]
+      "indexes": ["CREATE INDEX idx_ia_treino_created ON ia_treino (created)"]
     },
     {
       "name": "regras_direcionamento",
@@ -1003,24 +897,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE INDEX idx_regras_area ON regras_direcionamento (area)"
-      ]
+      "indexes": ["CREATE INDEX idx_regras_area ON regras_direcionamento (area)"]
     }
   ]
 }

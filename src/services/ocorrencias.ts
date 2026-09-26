@@ -24,6 +24,9 @@ export interface Ocorrencia {
   categoria?: string
   gravidade?: string
   prioridade?: string
+  area?: string
+  responsavel_nome?: string
+  visibilidade_multi?: string[]
   visibilidade?: string
   responsavel_id?: string
   sla_prazo?: string
@@ -207,6 +210,27 @@ export const getLembretes = (ocorrenciaId: string) =>
     filter: pb.filter('ocorrencia_id = {:id}', { id: ocorrenciaId }),
     sort: '-created',
   })
+
+// ===== Timeline (linha do tempo da ocorrência) =====
+export interface TimelineEvento {
+  quando: string
+  tipo: string
+  titulo: string
+  detalhe: string
+  autor: string
+}
+
+export interface TimelineData {
+  numero: number
+  status: string
+  parado_com: string
+  area: string
+  responsavel_esperado: string
+  eventos: TimelineEvento[]
+}
+
+export const getTimeline = (id: string) =>
+  pb.send<TimelineData>(`/backend/v1/ocorrencias/${id}/timeline`, { method: 'GET' })
 
 // ===== URL de arquivo =====
 export const fileUrl = (record: any, filename: string) => pb.files.getURL(record, filename)

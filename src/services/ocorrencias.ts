@@ -16,6 +16,10 @@ export interface Ocorrencia {
   acao_realizada?: string
   contato_loja?: string
   precisa_apoio?: boolean
+  acompanhamento_industria?: boolean
+  representante_id?: string
+  autorizado_representante?: string
+  lembretes_enviados?: number
   midia?: string[]
   categoria?: string
   gravidade?: string
@@ -150,6 +154,59 @@ export interface MensagemWhats {
 
 export const getMensagens = (options?: any) =>
   pb.collection('mensagens_whatsapp').getFullList({ sort: '-created', ...options })
+
+// ===== Representantes =====
+export interface Representante {
+  id: string
+  nome: string
+  email?: string
+  telefone?: string
+  industria_id?: string
+  ativo?: boolean
+  user_id?: string
+  expand?: {
+    user_id?: { id: string; name: string }
+    industria_id?: { id: string; nome: string }
+  }
+}
+
+export const getRepresentantes = () =>
+  pb.collection('representantes').getFullList({ sort: 'nome', expand: 'user_id,industria_id' })
+export const createRepresentante = (data: Partial<Representante>) =>
+  pb.collection('representantes').create(data)
+export const updateRepresentante = (id: string, data: Partial<Representante>) =>
+  pb.collection('representantes').update(id, data)
+export const deleteRepresentante = (id: string) => pb.collection('representantes').delete(id)
+
+// ===== Autorização de troca (representante → indústria) =====
+export const autorizarRepresentante = (
+  id: string,
+  data: { acao: 'autorizar' | 'recusar'; nota?: string },
+) =>
+  pb.send(`/backend/v1/ocorrencias/${id}/autorizar-representante`, {
+    method: 'POST',
+    body: data,
+  })
+
+// ===== Lembretes SLA =====
+export interface Lembrete {
+  id: string
+  ocorrencia_id: string
+  destinatario_tipo?: string
+  destinatario_nome?: string
+  destinatario_telefone?: string
+  mensagem: string
+  status?: string
+  erro?: string
+  enviado_em?: string
+  created?: string
+}
+
+export const getLembretes = (ocorrenciaId: string) =>
+  pb.collection('lembretes').getFullList({
+    filter: pb.filter('ocorrencia_id = {:id}', { id: ocorrenciaId }),
+    sort: '-created',
+  })
 
 // ===== URL de arquivo =====
 export const fileUrl = (record: any, filename: string) => pb.files.getURL(record, filename)

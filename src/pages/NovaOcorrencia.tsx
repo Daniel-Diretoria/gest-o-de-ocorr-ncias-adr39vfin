@@ -6,9 +6,11 @@ import {
   getIndustrias,
   getLojas,
   getPromotores,
+  getRepresentantes,
   Industria,
   Loja,
   Promotor,
+  Representante,
 } from '@/services/ocorrencias'
 import { useAuth } from '@/hooks/use-auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -33,6 +35,7 @@ const NovaOcorrencia = () => {
   const [industrias, setIndustrias] = useState<Industria[]>([])
   const [lojas, setLojas] = useState<Loja[]>([])
   const [promotores, setPromotores] = useState<Promotor[]>([])
+  const [representantes, setRepresentantes] = useState<Representante[]>([])
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState('')
 
@@ -49,6 +52,8 @@ const NovaOcorrencia = () => {
     acao_realizada: '',
     contato_loja: '',
     precisa_apoio: false,
+    acompanhamento_industria: true,
+    representante_id: '',
     categoria: '',
     gravidade: '',
     prioridade: '',
@@ -60,6 +65,7 @@ const NovaOcorrencia = () => {
     getIndustrias().then((r) => setIndustrias(r as any))
     getLojas().then((r) => setLojas(r as any))
     getPromotores().then((r) => setPromotores(r as any))
+    getRepresentantes().then((r) => setRepresentantes(r as any))
   }, [])
 
   const set = (campo: string, valor: any) => setForm((f) => ({ ...f, [campo]: valor }))
@@ -87,6 +93,8 @@ const NovaOcorrencia = () => {
         acao_realizada: form.acao_realizada,
         contato_loja: form.contato_loja,
         precisa_apoio: form.precisa_apoio,
+        acompanhamento_industria: form.acompanhamento_industria,
+        representante_id: form.representante_id || null,
         categoria: form.categoria || null,
         gravidade: form.gravidade || null,
         prioridade: form.prioridade || null,
@@ -258,6 +266,33 @@ const NovaOcorrencia = () => {
                 id="apoio"
               />
               <Label htmlFor="apoio">Precisa de apoio?</Label>
+            </div>
+            <div className="flex items-center gap-2 sm:col-span-2">
+              <Switch
+                checked={form.acompanhamento_industria}
+                onCheckedChange={(v) => set('acompanhamento_industria', v)}
+                id="acompanhamento"
+              />
+              <Label htmlFor="acompanhamento">Vai para acompanhamento da indústria?</Label>
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>Representante (autoriza trocas)</Label>
+              <Select
+                value={form.representante_id}
+                onValueChange={(v) => set('representante_id', v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Opcional — troca precisa passar por ele" />
+                </SelectTrigger>
+                <SelectContent>
+                  {representantes.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>
+                      {r.nome}
+                      {r.expand?.industria_id ? ` — ${r.expand.industria_id.nome}` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>

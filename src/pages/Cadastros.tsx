@@ -17,16 +17,20 @@ import {
   getIndustrias,
   getLojas,
   getPromotores,
+  getRepresentantes,
   getMensagens,
   createIndustria,
   createLoja,
   createPromotor,
+  createRepresentante,
   deleteIndustria,
   deleteLoja,
   deletePromotor,
+  deleteRepresentante,
   Industria,
   Loja,
   Promotor,
+  Representante,
   MensagemWhats,
 } from '@/services/ocorrencias'
 import { useRealtime } from '@/hooks/use-realtime'
@@ -45,6 +49,7 @@ const Cadastros = () => {
   const [industrias, setIndustrias] = useState<Industria[]>([])
   const [lojas, setLojas] = useState<Loja[]>([])
   const [promotores, setPromotores] = useState<Promotor[]>([])
+  const [representantes, setRepresentantes] = useState<Representante[]>([])
   const [mensagens, setMensagens] = useState<MensagemWhats[]>([])
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [erro, setErro] = useState('')
@@ -52,6 +57,12 @@ const Cadastros = () => {
   const [novaIndustria, setNovaIndustria] = useState('')
   const [novaLoja, setNovaLoja] = useState({ nome: '', rede: '', endereco: '' })
   const [novoPromotor, setNovoPromotor] = useState({ nome: '', telefone: '' })
+  const [novoRepresentante, setNovoRepresentante] = useState({
+    nome: '',
+    email: '',
+    telefone: '',
+    industria_id: '',
+  })
   const [novoUsuario, setNovoUsuario] = useState({
     name: '',
     email: '',
@@ -63,6 +74,7 @@ const Cadastros = () => {
     getIndustrias().then((r) => setIndustrias(r as any))
     getLojas().then((r) => setLojas(r as any))
     getPromotores().then((r) => setPromotores(r as any))
+    getRepresentantes().then((r) => setRepresentantes(r as any))
     getMensagens().then((r) => setMensagens(r as any))
     if (isAdmin)
       getUsuarios()
@@ -169,6 +181,18 @@ const Cadastros = () => {
     }
   }
 
+  const addRepresentante = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!novoRepresentante.nome.trim()) return
+    try {
+      await createRepresentante({ ...novoRepresentante, ativo: true })
+      setNovoRepresentante({ nome: '', email: '', telefone: '', industria_id: '' })
+      loadData()
+    } catch (err) {
+      setErro(getErrorMessage(err))
+    }
+  }
+
   const fmtData = (d?: string) => {
     if (!d) return '—'
     return new Date(d).toLocaleString('pt-BR', {
@@ -193,6 +217,7 @@ const Cadastros = () => {
           <TabsTrigger value="industrias">Indústrias ({industrias.length})</TabsTrigger>
           <TabsTrigger value="lojas">Lojas ({lojas.length})</TabsTrigger>
           <TabsTrigger value="promotores">Promotores ({promotores.length})</TabsTrigger>
+          <TabsTrigger value="representantes">Representantes ({representantes.length})</TabsTrigger>
           <TabsTrigger value="mensagens">Mensagens WhatsApp ({mensagens.length})</TabsTrigger>
           {isAdmin && <TabsTrigger value="usuarios">Usuários ({usuarios.length})</TabsTrigger>}
           <TabsTrigger value="importar">Importar conversa</TabsTrigger>
@@ -410,6 +435,109 @@ const Cadastros = () => {
                     <tr>
                       <td colSpan={4} className="p-6 text-center text-muted-foreground">
                         Nenhum promotor cadastrado.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="representantes" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Novo representante</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={addRepresentante} className="grid gap-2 sm:grid-cols-5">
+                <Input
+                  value={novoRepresentante.nome}
+                  onChange={(e) => setNovoRepresentante((r) => ({ ...r, nome: e.target.value }))}
+                  placeholder="Nome do representante *"
+                  required
+                />
+                <Input
+                  value={novoRepresentante.email}
+                  onChange={(e) => setNovoRepresentante((r) => ({ ...r, email: e.target.value }))}
+                  placeholder="E-mail"
+                  type="email"
+                />
+                <Input
+                  value={novoRepresentante.telefone}
+                  onChange={(e) =>
+                    setNovoRepresentante((r) => ({ ...r, telefone: e.target.value }))
+                  }
+                  placeholder="Telefone (WhatsApp)"
+                />
+                <Select
+                  value={novoRepresentante.industria_id}
+                  onValueChange={(v) => setNovoRepresentante((r) => ({ ...r, industria_id: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Indústria (opcional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {industrias.map((i) => (
+                      <SelectItem key={i.id} value={i.id}>
+                        {i.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button type="submit">Adicionar</Button>
+              </form>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-0">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-muted-foreground">
+                    <th className="p-3 font-medium">Nome</th>
+                    <th className="p-3 font-medium">Contato</th>
+                    <th className="p-3 font-medium">Indústria</th>
+                    <th className="p-3 font-medium">Acesso</th>
+                    <th className="p-3 w-12"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {representantes.map((r) => (
+                    <tr key={r.id} className="border-b last:border-0">
+                      <td className="p-3">{r.nome}</td>
+                      <td className="p-3">
+                        {[r.telefone, r.email].filter(Boolean).join(' · ') || '—'}
+                      </td>
+                      <td className="p-3">{r.expand?.industria_id?.nome || '—'}</td>
+                      <td className="p-3">
+                        {r.expand?.user_id ? (
+                          <Badge variant="secondary">login criado</Badge>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">
+                            sem acesso — criar usuário em Usuários (papel representante)
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={async () => {
+                            if (confirm(`Excluir ${r.nome}?`)) {
+                              await deleteRepresentante(r.id)
+                              loadData()
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                  {representantes.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="p-6 text-center text-muted-foreground">
+                        Nenhum representante cadastrado.
                       </td>
                     </tr>
                   )}

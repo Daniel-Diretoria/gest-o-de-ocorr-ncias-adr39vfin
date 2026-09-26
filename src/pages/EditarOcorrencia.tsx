@@ -6,9 +6,11 @@ import {
   getIndustrias,
   getLojas,
   getPromotores,
+  getRepresentantes,
   Industria,
   Loja,
   Promotor,
+  Representante,
 } from '@/services/ocorrencias'
 import { useAuth } from '@/hooks/use-auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -33,6 +35,8 @@ const EditarOcorrencia = () => {
   const [industrias, setIndustrias] = useState<Industria[]>([])
   const [lojas, setLojas] = useState<Loja[]>([])
   const [promotores, setPromotores] = useState<Promotor[]>([])
+  const [representantes, setRepresentantes] = useState<Representante[]>([])
+  const [novasFotos, setNovasFotos] = useState<File[]>([])
   const [loading, setLoading] = useState(true)
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
@@ -50,6 +54,8 @@ const EditarOcorrencia = () => {
     acao_realizada: '',
     contato_loja: '',
     precisa_apoio: false,
+    acompanhamento_industria: true,
+    representante_id: '',
     categoria: '',
     gravidade: '',
     prioridade: '',
@@ -57,8 +63,14 @@ const EditarOcorrencia = () => {
 
   useEffect(() => {
     if (!id) return
-    Promise.all([getOcorrencia(id), getIndustrias(), getLojas(), getPromotores()])
-      .then(([o, i, l, p]) => {
+    Promise.all([
+      getOcorrencia(id),
+      getIndustrias(),
+      getLojas(),
+      getPromotores(),
+      getRepresentantes(),
+    ])
+      .then(([o, i, l, p, r]) => {
         const oc = o as any
         setForm({
           data_ocorrencia: String(oc.data_ocorrencia || '').slice(0, 10),
@@ -73,6 +85,8 @@ const EditarOcorrencia = () => {
           acao_realizada: oc.acao_realizada || '',
           contato_loja: oc.contato_loja || '',
           precisa_apoio: !!oc.precisa_apoio,
+          acompanhamento_industria: oc.acompanhamento_industria !== false,
+          representante_id: oc.representante_id || '',
           categoria: oc.categoria || '',
           gravidade: oc.gravidade || '',
           prioridade: oc.prioridade || '',
@@ -80,6 +94,7 @@ const EditarOcorrencia = () => {
         setIndustrias(i as any)
         setLojas(l as any)
         setPromotores(p as any)
+        setRepresentantes(r as any)
       })
       .finally(() => setLoading(false))
   }, [id])
@@ -96,7 +111,7 @@ const EditarOcorrencia = () => {
     }
     setSalvando(true)
     try {
-      await updateOcorrencia(id, {
+      const data: any = {
         data_ocorrencia: `${form.data_ocorrencia} 12:00:00.000Z`,
         promotor_id: form.promotor_id || null,
         repositor_nome: form.repositor_nome,
@@ -109,10 +124,22 @@ const EditarOcorrencia = () => {
         acao_realizada: form.acao_realizada,
         contato_loja: form.contato_loja,
         precisa_apoio: form.precisa_apoio,
+        acompanhamento_industria: form.acompanhamento_industria,
+        representante_id: form.representante_id || null,
         categoria: form.categoria || null,
         gravidade: form.gravidade || null,
         prioridade: form.prioridade || null,
-      })
+      }
+      if (novasFotos.length > 0) {
+        const fd = new FormData()
+        Object.entries(data).forEach(([k, v]) => {
+          if (v !== null && v !== undefined) fd.append(k, String(v))
+        })
+        novasFotos.forEach((f) => fd.append('midia', f))
+        await updateOcorrencia(id, fd)
+      } else {
+        await updateOcorrencia(id, data)
+      }
       navigate(`/ocorrencias/${id}`)
     } catch (err: any) {
       setErro(err?.response?.data ? JSON.stringify(err.response.data) : 'Erro ao salvar.')
@@ -256,6 +283,41 @@ const EditarOcorrencia = () => {
                 id="apoio-edit"
               />
               <Label htmlFor="apoio-edit">Precisa de apoio?</Label>
+            </div>
+            <div className="flex items-center gap-2 sm:col-span-2">
+              <Switch
+                checked={form.acompanhamento_industria}
+                onCheckedChange={(v) => set('acompanhamento_industria', v)}
+                id="acompanhamento-edit"
+              />
+              <Label htmlFor="acompanhamento-edit">Vai para acompanhamento da indústria?</Label>
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>Representante (autoriza trocas)</Label>
+              <Select
+                value={form.representante_id}
+                onValueChange={(v) => set('representante_id', v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Opcional" />
+                </SelectTrigger>
+                <SelectContent>
+                  {representantes.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>
+                      {r.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>Adicionar fotos/evidências</Label>
+              <Input
+                type="file"
+                accept="image/*,video/mp4,video/quicktime"
+                multiple
+                onChange={(e) => setNovasFotos(Array.from(e.target.files || []))}
+              />
             </div>
           </CardContent>
         </Card>

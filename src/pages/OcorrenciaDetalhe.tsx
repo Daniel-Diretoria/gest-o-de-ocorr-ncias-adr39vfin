@@ -5,8 +5,11 @@ import {
   getTratativas,
   createTratativa,
   updateOcorrencia,
+  getLembretes,
+  autorizarRepresentante,
   Ocorrencia as OcType,
   Tratativa,
+  Lembrete,
   fileUrl,
 } from '@/services/ocorrencias'
 import { useAuth } from '@/hooks/use-auth'
@@ -48,6 +51,7 @@ const OcorrenciaDetalhe = () => {
   const [tipo, setTipo] = useState('observacao')
   const [evidencia, setEvidencia] = useState<File | null>(null)
   const [enviando, setEnviando] = useState(false)
+  const [lembretes, setLembretes] = useState<Lembrete[]>([])
 
   const loadData = async () => {
     if (!id) return
@@ -56,6 +60,9 @@ const OcorrenciaDetalhe = () => {
       setOc(o as any)
       const t = await getTratativas(id)
       setTratativas(t as any)
+      getLembretes(id)
+        .then((l) => setLembretes(l as any))
+        .catch(() => {})
     } finally {
       setLoading(false)
     }
@@ -177,6 +184,56 @@ const OcorrenciaDetalhe = () => {
         </div>
       )}
 
+      {/* Fluxo de troca: representante autoriza → indústria */}
+      {aberta && oc.representante_id && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              Autorização de troca — representante{' '}
+              {oc.autorizado_representante ? '✅ autorizada' : '⏳ pendente'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap items-center gap-2">
+            {!oc.autorizado_representante ? (
+              <>
+                <span className="text-sm text-muted-foreground">
+                  Troca aguardando autorização do representante. Depois da autorização, a ocorrência{' '}
+                  {oc.acompanhamento_industria
+                    ? 'segue para a indústria.'
+                    : 'segue em tratativa interna.'}
+                </span>
+                <Button
+                  size="sm"
+                  onClick={async () => {
+                    await autorizarRepresentante(oc.id, { acao: 'autorizar' })
+                    loadData()
+                  }}
+                >
+                  Autorizar troca
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={async () => {
+                    await autorizarRepresentante(oc.id, { acao: 'recusar' })
+                    loadData()
+                  }}
+                >
+                  Recusar
+                </Button>
+              </>
+            ) : (
+              <span className="text-sm text-muted-foreground">
+                Autorizada em {fmtData(oc.autorizado_representante)} —{' '}
+                {oc.acompanhamento_industria
+                  ? 'acompanhamento da indústria ativo.'
+                  : 'tratativa interna.'}
+              </span>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -215,6 +272,14 @@ const OcorrenciaDetalhe = () => {
             <p>
               <span className="text-muted-foreground">Categoria:</span>{' '}
               {oc.categoria ? CATEGORIA_LABELS[oc.categoria] || oc.categoria : '—'}
+            </p>
+            <p>
+              <span className="text-muted-foreground">Acompanhamento da indústria:</span>{' '}
+              {oc.acompanhamento_industria ? 'Sim' : 'Não'}
+            </p>
+            <p>
+              <span className="text-muted-foreground">Lembretes de SLA enviados:</span>{' '}
+              {oc.lembretes_enviados || 0}
             </p>
           </CardContent>
         </Card>
@@ -262,6 +327,28 @@ const OcorrenciaDetalhe = () => {
         <CardContent className="space-y-4">
           {tratativas.length === 0 && (
             <p className="text-sm text-muted-foreground">Nenhuma tratativa registrada ainda.</p>
+          )}
+          {lembretes.length > 0 && (
+            <div className="border rounded-lg p-3 space-y-2 bg-muted/40">
+              <p className="text-xs font-medium text-muted-foreground">
+                Lembretes automáticos de SLA ({lembretes.length}) — disparo por WhatsApp quando o
+                Digisac for conectado
+              </p>
+              {lembretes.map((l) => (
+                <div key={l.id} className="text-xs space-y-0.5">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Badge variant="outline">{l.destinatario_tipo || 'lembrete'}</Badge>
+                    <span>{l.destinatario_nome || '—'}</span>
+                    <span>·</span>
+                    <span>{fmtData(l.created)}</span>
+                    <Badge variant={l.status === 'pendente' ? 'secondary' : 'default'}>
+                      {l.status || 'pendente'}
+                    </Badge>
+                  </div>
+                  <p className="whitespace-pre-wrap">{l.mensagem}</p>
+                </div>
+              ))}
+            </div>
           )}
           {tratativas.map((t) => (
             <div key={t.id} className="border rounded-lg p-3 space-y-1">

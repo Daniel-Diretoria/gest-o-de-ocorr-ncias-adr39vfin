@@ -449,6 +449,56 @@ onRecordCreate((e) => {
     rec.set('status', 'direcionada')
   }
 
+  // IO — área + responsável esperado: a IA lê a situação com as regras do
+  // Daniel (quem responde pelo quê) e grava em area/responsavel_nome.
+  if (!String(rec.get('area') || '') && situacao) {
+    try {
+      const replyArea = $ai.chat({
+        model: 'fast',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'Você direciona ocorrências de merchandising por ÁREA de responsabilidade. ' +
+              'Responda SOMENTE com JSON: {"area":"...","responsavel":"..."}. ' +
+              'Áreas e responsáveis (siga EXATAMENTE): ' +
+              'io (Rhuan) = trocas, validades, rupturas, estoque virtual, relatórios — tudo de Inteligência Operacional; ' +
+              'operacao_loja (Fernando) = empilhadeira/empilhador, paletes, câmara fria, desorganização de loja, abastecimento demorado, fila; ' +
+              'merchandising (Felipe) = Splash, precificação, cartaz, encarte, ação de merchandising, conexão loja-indústria; ' +
+              'pontos_extras (Gabriel Oliveira, Gabriel Luz e Arthur) = ponto extra, aumento de espaço, ganhos no PDV; ' +
+              'acesso_loja (Carol) = QR Code, Betina, entrada e saída em loja, crachá; ' +
+              'outro = não se encaixa. ' +
+              'Regra: problema da LOJA que afeta o setor todo e não pertence a ninguém acima = operacao_loja.',
+          },
+          { role: 'user', content: 'Situação: ' + situacao.slice(0, 800) },
+        ],
+      })
+      const tA =
+        (replyArea &&
+          replyArea.choices &&
+          replyArea.choices[0] &&
+          replyArea.choices[0].message &&
+          replyArea.choices[0].message.content) ||
+        ''
+      const mA = tA.match(/\{[\s\S]*\}/)
+      if (mA) {
+        const jA = JSON.parse(mA[0])
+        const areas = [
+          'io',
+          'operacao_loja',
+          'merchandising',
+          'pontos_extras',
+          'acesso_loja',
+          'outro',
+        ]
+        if (areas.indexOf(jA.area) !== -1) rec.set('area', jA.area)
+        if (jA.responsavel) rec.set('responsavel_nome', String(jA.responsavel).slice(0, 120))
+      }
+    } catch (err) {
+      $app.logger().warn('IA de área falhou', 'error', String(err))
+    }
+  }
+
   e.next()
 }, 'ocorrencias')
 

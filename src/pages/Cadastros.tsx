@@ -23,8 +23,9 @@ import {
   MensagemWhats,
 } from '@/services/ocorrencias'
 import { useRealtime } from '@/hooks/use-realtime'
-import { Trash2 } from 'lucide-react'
+import { Trash2, UserPlus } from 'lucide-react'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
+import { getUsuarios, createUsuario, deleteUsuario, Usuario } from '@/services/ocorrencias'
 
 const Cadastros = () => {
   const { isAdmin } = useAuth()
@@ -32,17 +33,55 @@ const Cadastros = () => {
   const [lojas, setLojas] = useState<Loja[]>([])
   const [promotores, setPromotores] = useState<Promotor[]>([])
   const [mensagens, setMensagens] = useState<MensagemWhats[]>([])
+  const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [erro, setErro] = useState('')
 
   const [novaIndustria, setNovaIndustria] = useState('')
   const [novaLoja, setNovaLoja] = useState({ nome: '', rede: '', endereco: '' })
   const [novoPromotor, setNovoPromotor] = useState({ nome: '', telefone: '' })
+  const [novoUsuario, setNovoUsuario] = useState({
+    name: '',
+    email: '',
+    senha: '',
+    role: 'promotor',
+  })
 
   const loadData = () => {
     getIndustrias().then((r) => setIndustrias(r as any))
     getLojas().then((r) => setLojas(r as any))
     getPromotores().then((r) => setPromotores(r as any))
     getMensagens().then((r) => setMensagens(r as any))
+    if (isAdmin)
+      getUsuarios()
+        .then((r) => setUsuarios(r as any))
+        .catch(() => {})
+  }
+
+  const addUsuario = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!novoUsuario.name.trim() || !novoUsuario.email.trim() || novoUsuario.senha.length < 8) {
+      setErro('Nome, e-mail e senha de no mínimo 8 caracteres são obrigatórios.')
+      return
+    }
+    try {
+      await createUsuario(novoUsuario)
+      setNovoUsuario({ name: '', email: '', senha: '', role: 'promotor' })
+      setErro('')
+      getUsuarios().then((r) => setUsuarios(r as any))
+    } catch (err) {
+      setErro(getErrorMessage(err))
+    }
+  }
+
+  const removeUsuario = async (id: string, nome: string) => {
+    if (confirm(`Excluir o acesso de ${nome}?`)) {
+      try {
+        await deleteUsuario(id)
+        getUsuarios().then((r) => setUsuarios(r as any))
+      } catch (err) {
+        setErro(getErrorMessage(err))
+      }
+    }
   }
 
   useEffect(() => {
@@ -114,6 +153,7 @@ const Cadastros = () => {
           <TabsTrigger value="lojas">Lojas ({lojas.length})</TabsTrigger>
           <TabsTrigger value="promotores">Promotores ({promotores.length})</TabsTrigger>
           <TabsTrigger value="mensagens">Mensagens WhatsApp ({mensagens.length})</TabsTrigger>
+          {isAdmin && <TabsTrigger value="usuarios">Usuários ({usuarios.length})</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="industrias" className="space-y-4">
@@ -373,6 +413,102 @@ const Cadastros = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {isAdmin && (
+          <TabsContent value="usuarios" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Novo acesso</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={addUsuario} className="grid gap-2 sm:grid-cols-5">
+                  <Input
+                    value={novoUsuario.name}
+                    onChange={(e) => setNovoUsuario((u) => ({ ...u, name: e.target.value }))}
+                    placeholder="Nome *"
+                    required
+                  />
+                  <Input
+                    type="email"
+                    value={novoUsuario.email}
+                    onChange={(e) => setNovoUsuario((u) => ({ ...u, email: e.target.value }))}
+                    placeholder="E-mail *"
+                    required
+                  />
+                  <Input
+                    type="password"
+                    value={novoUsuario.senha}
+                    onChange={(e) => setNovoUsuario((u) => ({ ...u, senha: e.target.value }))}
+                    placeholder="Senha (mín. 8) *"
+                    required
+                    minLength={8}
+                  />
+                  <Select
+                    value={novoUsuario.role}
+                    onValueChange={(v) => setNovoUsuario((u) => ({ ...u, role: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="promotor">Promotor</SelectItem>
+                      <SelectItem value="supervisao">Supervisão</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button type="submit">
+                    <UserPlus className="h-4 w-4 mr-1" /> Criar acesso
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-0">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-left text-muted-foreground">
+                      <th className="p-3 font-medium">Nome</th>
+                      <th className="p-3 font-medium">E-mail</th>
+                      <th className="p-3 font-medium">Perfil</th>
+                      <th className="p-3 w-12"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {usuarios.map((u) => (
+                      <tr key={u.id} className="border-b last:border-0">
+                        <td className="p-3">{u.name}</td>
+                        <td className="p-3">{u.email}</td>
+                        <td className="p-3">
+                          {u.role === 'admin'
+                            ? 'Administrador'
+                            : u.role === 'supervisao'
+                              ? 'Supervisão'
+                              : 'Promotor'}
+                        </td>
+                        <td className="p-3">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeUsuario(u.id, u.name)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {usuarios.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="p-6 text-center text-muted-foreground">
+                          Nenhum usuário listado.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   )

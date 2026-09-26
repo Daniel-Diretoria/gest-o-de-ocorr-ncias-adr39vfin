@@ -208,4 +208,22 @@ export interface DashboardData {
 export const getDashboard = () => pb.send<DashboardData>('/backend/v1/dashboard', { method: 'GET' })
 
 export const getUsuarios = () =>
-  pb.collection('users').getFullList({ sort: 'name', fields: 'id,name,email,role' })
+  pb.collection('users').getFullList({ sort: 'name', fields: 'id,name,email,role,created' })
+
+export interface NovoUsuario {
+  name: string
+  email: string
+  senha: string
+  role: string
+}
+
+export const createUsuario = (u: NovoUsuario) =>
+  pb.collection('users').create({
+    name: u.name,
+    email: u.email,
+    password: u.senha,
+    passwordConfirm: u.senha,
+    role: u.role,
+  })
+
+export const deleteUsuario = (id: string) => pb.collection('users').delete(id)

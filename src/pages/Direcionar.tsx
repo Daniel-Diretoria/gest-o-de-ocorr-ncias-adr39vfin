@@ -30,6 +30,7 @@ const CATEGORIAS = [
   'reposicao',
   'equipamento',
   'atendimento',
+  'operacional',
   'outro',
 ]
 const GRAVIDADES = ['baixa', 'media', 'alta', 'critica']

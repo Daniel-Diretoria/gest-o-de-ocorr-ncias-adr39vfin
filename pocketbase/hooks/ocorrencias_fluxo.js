@@ -187,7 +187,8 @@ routerAdd(
             'Você classifica ocorrências de merchandising em supermercados e farmácias. ' +
             'Responda SOMENTE com um JSON válido, sem texto fora do JSON, no formato: ' +
             '{"categoria":"...","gravidade":"...","prioridade":"...","visibilidade":"...","justificativa":"..."}. ' +
-            'categoria: estrutura|ruptura|validade|avaria|reposicao|equipamento|atendimento|outro. ' +
+            'categoria: estrutura|ruptura|validade|avaria|reposicao|equipamento|atendimento|operacional|outro ' +
+            '(operacional = problema da LOJA/OPERAÇÃO que afeta o setor todo, sem indústria específica). ' +
             'gravidade: baixa|media|alta|critica. prioridade: baixa|media|alta|urgente. ' +
             'visibilidade: interno|representante|industria. justificativa: 1 frase curta.',
         },
@@ -366,6 +367,24 @@ onRecordCreate((e) => {
 
   if (!categoria && situacao) {
     try {
+      // Few-shot: últimos exemplos corrigidos pela supervisão — a IA aprende
+      // o padrão da casa (ex.: sem indústria e afeta o setor = operacional).
+      let exemplos = ''
+      try {
+        const ts = $app.findRecordsByFilter('ia_treino', '', '-created', 10, 0)
+        for (let i = 0; i < ts.length; i++) {
+          exemplos +=
+            'Situação: ' +
+            String(ts[i].get('situacao') || '').slice(0, 200) +
+            ' => categoria: ' +
+            String(ts[i].get('categoria') || '') +
+            ', gravidade: ' +
+            String(ts[i].get('gravidade') || '') +
+            ', prioridade: ' +
+            String(ts[i].get('prioridade') || '') +
+            '\n'
+        }
+      } catch (_) {}
       const reply = $ai.chat({
         model: 'fast',
         messages: [
@@ -375,8 +394,14 @@ onRecordCreate((e) => {
               'Você classifica ocorrências de merchandising em supermercados e farmácias. ' +
               'Responda SOMENTE com um JSON válido, sem texto fora do JSON, no formato: ' +
               '{"categoria":"...","gravidade":"...","prioridade":"..."}. ' +
-              'categoria: estrutura|ruptura|validade|avaria|reposicao|equipamento|atendimento|outro. ' +
-              'gravidade: baixa|media|alta|critica. prioridade: baixa|media|alta|urgente.',
+              'categoria: estrutura|ruptura|validade|avaria|reposicao|equipamento|atendimento|operacional|outro ' +
+              '(operacional = problema da LOJA/OPERAÇÃO que afeta o setor todo, sem indústria específica — ' +
+              'ex.: empilhador quebrado, fila para descarregar, sistema da loja fora do ar, acesso demorado). ' +
+              'gravidade: baixa|media|alta|critica. prioridade: baixa|media|alta|urgente. ' +
+              (exemplos
+                ? 'Exemplos já corrigidos pela supervisão desta empresa (siga este padrão):\n' +
+                  exemplos
+                : ''),
           },
           { role: 'user', content: 'Situação reportada: ' + situacao },
         ],

@@ -342,6 +342,7 @@ const EditarOcorrencia = () => {
                     'reposicao',
                     'equipamento',
                     'atendimento',
+                    'operacional',
                     'outro',
                   ].map((c) => (
                     <SelectItem key={c} value={c}>
